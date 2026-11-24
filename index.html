@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#070b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>网络建设与运维 · 闯关实验室</title>
+<style>
+:root{
+  --bg:#070b12;
+  --panel:rgba(20,27,42,.78);
+  --panel2:rgba(28,37,56,.72);
+  --line:rgba(255,255,255,.085);
+  --line2:rgba(255,255,255,.16);
+  --txt:#e8eefb;
+  --dim:#8a9bb6;
+  --cy:#22d3ee;
+  --pu:#a78bfa;
+  --gr:#34d399;
+  --am:#fbbf24;
+  --rd:#f87171;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(34,211,238,.13), transparent 62%),
+    radial-gradient(760px 480px at 92% 4%, rgba(167,139,250,.13), transparent 60%),
+    radial-gradient(900px 600px at 50% 108%, rgba(52,211,153,.07), transparent 62%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 78%);
+  -webkit-mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 78%);
+}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 16px 40px;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+@media(min-width:760px){.wrap{padding:32px 24px 64px}}
+
+/* ---------- topbar ---------- */
+.topbar{display:flex;flex-direction:column;gap:12px;align-items:stretch;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{
+  width:40px;height:40px;flex:0 0 40px;border-radius:12px;display:grid;place-items:center;
+  font-size:19px;color:#04121a;
+  background:linear-gradient(140deg,var(--cy),var(--pu));
+  box-shadow:0 6px 22px rgba(34,211,238,.34);
+}
+.brand h1{font-size:17px;margin:0;letter-spacing:.3px;font-weight:700}
+.brand p{margin:0;font-size:11.5px;color:var(--dim);letter-spacing:.6px}
+.rankbox{min-width:0}
+.rankline{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12.5px}
+@media(min-width:640px){
+  .topbar{flex-direction:row;align-items:center;justify-content:space-between;gap:14px}
+  .rankbox{flex:1 1 200px;max-width:280px;margin-left:auto}
+  .rankline{justify-content:flex-end}
+}
+.rank-name{color:var(--cy);font-weight:700;letter-spacing:.4px}
+.rank-xp{color:var(--dim);font-family:var(--mono);font-size:11.5px}
+.xpbar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);margin-top:6px;overflow:hidden}
+.xpbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--cy),var(--pu));transition:width .7s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(34,211,238,.6)}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  border:1px solid var(--line);border-radius:20px;padding:20px 18px;
+  background:linear-gradient(150deg,rgba(34,211,238,.1),rgba(167,139,250,.09) 55%,rgba(20,27,42,.5));
+  margin-bottom:22px;
+}
+.hero h2{margin:0 0 6px;font-size:21px;line-height:1.35;letter-spacing:.2px}
+@media(min-width:760px){.hero h2{font-size:26px}}
+.hero p{margin:0;color:var(--dim);font-size:13.5px}
+.hero-stats{display:flex;gap:22px;margin-top:16px;flex-wrap:wrap}
+.hstat{min-width:64px}
+.hstat b{display:block;font-size:20px;font-family:var(--mono);letter-spacing:.5px}
+.hstat span{font-size:11.5px;color:var(--dim);letter-spacing:.5px}
+
+/* ---------- cards ---------- */
+.section-title{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font-size:13px;color:var(--dim);letter-spacing:1.6px;text-transform:uppercase}
+.section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:700px){.grid{grid-template-columns:1fr 1fr}}
+@media(min-width:980px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+.card{
+  position:relative;text-align:left;cursor:pointer;color:inherit;font-family:inherit;
+  border:1px solid var(--line);border-radius:18px;padding:16px;
+  background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .22s;
+  overflow:hidden;
+}
+.card::before{content:"";position:absolute;inset:0;border-radius:18px;opacity:0;transition:opacity .25s;background:radial-gradient(320px 180px at 15% 0%,var(--accent-soft),transparent 70%);pointer-events:none}
+.card:active{transform:scale(.985)}
+@media(hover:hover){.card:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 14px 34px rgba(0,0,0,.42)}.card:hover::before{opacity:1}}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-right:42px}
+.icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:var(--accent-soft);border:1px solid var(--accent-line)}
+.tag{font-size:10.5px;letter-spacing:1.1px;color:var(--dim);font-family:var(--mono);border:1px solid var(--line);padding:2px 8px;border-radius:99px}
+.card h3{margin:0 0 3px;font-size:16px;letter-spacing:.2px}
+.card .en{font-size:10.5px;color:var(--accent);letter-spacing:.6px;font-family:var(--mono);opacity:.85;margin-bottom:8px}
+.card p.desc{margin:0 0 12px;font-size:12.5px;color:var(--dim);line-height:1.55;min-height:2.6em}
+.stars{font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.14);margin-bottom:6px}
+.stars i{font-style:normal;color:var(--am);text-shadow:0 0 10px rgba(251,191,36,.45)}
+.card-meta{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--dim);font-family:var(--mono)}
+.go{color:var(--accent);font-weight:700}
+.cheatbtn{
+  position:absolute;top:12px;right:12px;z-index:3;width:32px;height:32px;border-radius:9px;
+  display:grid;place-items:center;font-size:14px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--dim);
+  transition:.2s;
+}
+.cheatbtn:active{transform:scale(.9);color:var(--txt)}
+.card.boss{grid-column:1/-1;border-color:rgba(251,191,36,.3);background:linear-gradient(140deg,rgba(251,191,36,.09),rgba(20,27,42,.8))}
+.card.boss .icon{background:rgba(251,191,36,.13);border-color:rgba(251,191,36,.3)}
+.card.locked{opacity:.5;cursor:not-allowed}
+.card.locked:active{transform:none}
+
+/* ---------- badges ---------- */
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:flex;align-items:center;gap:7px;padding:7px 12px 7px 9px;border-radius:12px;
+  border:1px solid var(--line);background:var(--panel2);font-size:12px;
+}
+.badge .bi{font-size:15px}
+.badge.locked{opacity:.38;filter:grayscale(1)}
+.badge small{display:block;color:var(--dim);font-size:10px;line-height:1.2}
+
+/* ---------- game screen ---------- */
+.gamehead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.iconbtn{
+  width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--panel);color:var(--txt);font-size:16px;cursor:pointer;
+}
+.iconbtn:active{transform:scale(.93)}
+.gtitle{flex:1;min-width:0}
+.gtitle b{display:block;font-size:14.5px;letter-spacing:.2px}
+.gtitle span{font-size:11.5px;color:var(--dim);font-family:var(--mono)}
+.combo{
+  font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--am);
+  border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.1);
+  padding:3px 10px;border-radius:99px;white-space:nowrap;
+}
+.combo.hide{opacity:0;transform:scale(.8)}
+.progress{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--cy),var(--pu));border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+
+.qcard{
+  border:1px solid var(--line);border-radius:18px;padding:18px 16px;
+  background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  animation:rise .38s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.qtags{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.qt{font-size:10.5px;letter-spacing:.7px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim);font-family:var(--mono)}
+.qt.main{color:var(--cy);border-color:rgba(34,211,238,.32);background:rgba(34,211,238,.08)}
+.qt.multi{color:var(--pu);border-color:rgba(167,139,250,.32);background:rgba(167,139,250,.08)}
+.qt.order{color:var(--am);border-color:rgba(251,191,36,.32);background:rgba(251,191,36,.08)}
+.qt.fill{color:var(--gr);border-color:rgba(52,211,153,.32);background:rgba(52,211,153,.08)}
+
+.scenario{
+  font-family:var(--mono);font-size:12.5px;line-height:1.75;color:#b9c8dd;
+  border-left:2px solid var(--cy);background:rgba(34,211,238,.06);
+  padding:11px 13px;border-radius:0 10px 10px 0;margin-bottom:14px;white-space:pre-wrap;
+}
+.scenario::before{content:"SCENARIO";display:block;font-size:9.5px;letter-spacing:2px;color:var(--cy);opacity:.75;margin-bottom:5px}
+
+.qtext{font-size:16px;line-height:1.7;margin:0 0 16px;font-weight:600;letter-spacing:.2px}
+@media(min-width:760px){.qtext{font-size:17px}}
+
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{
+  position:relative;display:flex;align-items:flex-start;gap:11px;
+  width:100%;text-align:left;font-family:inherit;font-size:15px;line-height:1.55;
+  padding:13px 14px;border-radius:14px;cursor:pointer;color:var(--txt);
+  border:1px solid var(--line);background:rgba(255,255,255,.028);
+  transition:border-color .18s,background .18s,transform .12s;
+  min-height:50px;
+}
+.opt:active{transform:scale(.985)}
+.opt .k{
+  flex:0 0 24px;height:24px;border-radius:8px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--dim);
+  background:rgba(255,255,255,.055);border:1px solid var(--line);margin-top:1px;
+  transition:.18s;
+}
+.opt.sel{border-color:rgba(34,211,238,.55);background:rgba(34,211,238,.1)}
+.opt.sel .k{background:rgba(34,211,238,.22);color:var(--cy);border-color:rgba(34,211,238,.5)}
+.opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
+.opt.correct .k{background:var(--gr);color:#04120c;border-color:var(--gr)}
+.opt.wrong{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.11)}
+.opt.wrong .k{background:var(--rd);color:#1a0404;border-color:var(--rd)}
+.opt.muted{opacity:.45}
+.opt.dim{pointer-events:none}
+.opt .num{
+  flex:0 0 24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;color:#04121a;
+  background:linear-gradient(140deg,var(--cy),var(--pu));margin-top:1px;
+  animation:pop .22s cubic-bezier(.2,1.6,.4,1);
+}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.opt.picked{opacity:.45;border-style:dashed}
+
+.seqbox{
+  border:1px dashed var(--line2);border-radius:14px;padding:11px;margin-bottom:12px;
+  min-height:56px;display:flex;flex-direction:column;gap:7px;background:rgba(0,0,0,.16);
+}
+.seqbox .ph{color:var(--dim);font-size:12.5px;text-align:center;padding:6px 0}
+.seqitem{display:flex;align-items:center;gap:9px;font-size:13.5px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.28);border-radius:10px;padding:8px 11px;animation:pop .2s}
+.seqitem .n{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--pu);flex:0 0 18px}
+
+.fillwrap{display:flex;flex-direction:column;gap:10px}
+.fillwrap input{
+  width:100%;font-family:var(--mono);font-size:16px;padding:14px 15px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--txt);outline:none;
+  transition:.2s;-webkit-appearance:none;
+}
+.fillwrap input:focus{border-color:rgba(34,211,238,.6);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+.fillwrap input::placeholder{color:rgba(138,155,182,.55)}
+.hintline{font-size:12px;color:var(--am);font-family:var(--mono);min-height:1em}
+.hintbtn{align-self:flex-start;font-size:12px;color:var(--dim);background:none;border:none;border-bottom:1px dashed var(--line2);cursor:pointer;padding:0 0 2px;font-family:inherit}
+
+/* ---------- feedback ---------- */
+.fb{
+  margin-top:16px;border-radius:16px;padding:14px 15px;animation:rise .3s both;
+  border:1px solid var(--line);background:rgba(255,255,255,.035);
+}
+.fb.ok{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.075)}
+.fb.no{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.075)}
+.fb-h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin-bottom:7px}
+.fb.ok .fb-h{color:var(--gr)}
+.fb.no .fb-h{color:var(--rd)}
+.fb-b{font-size:13.5px;line-height:1.75;color:#c3d0e2}
+.fb-b code{
+  font-family:var(--mono);font-size:12.5px;background:rgba(34,211,238,.12);color:var(--cy);
+  padding:1px 6px;border-radius:6px;border:1px solid rgba(34,211,238,.2);
+  word-break:break-all;
+}
+.fb-b b{color:var(--txt)}
+
+/* ---------- bottom action bar ---------- */
+.actionbar{
+  position:sticky;bottom:0;z-index:20;margin-top:16px;
+  padding:16px 0 calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(7,11,18,0),rgba(7,11,18,.955) 26%);
+  display:flex;gap:10px;
+}
+.btn{
+  flex:1;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.4px;
+  padding:15px 18px;border-radius:14px;border:1px solid var(--line2);
+  background:rgba(255,255,255,.06);color:var(--txt);cursor:pointer;
+  transition:transform .12s,box-shadow .2s,opacity .2s;
+  min-height:52px;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.btn:active{transform:scale(.98)}
+.btn:disabled{cursor:not-allowed}
+.btn.primary{
+  background:linear-gradient(140deg,var(--cy),#3b82f6);color:#04121a;border-color:transparent;
+  box-shadow:0 8px 26px rgba(34,211,238,.28);
+}
+.btn.primary:disabled{
+  background:rgba(255,255,255,.05);color:rgba(138,155,182,.75);
+  border-color:var(--line);box-shadow:none;
+}
+.actionbar.home{position:static;background:none;padding-top:16px}
+.actionbar.home .btn{flex:0 1 240px;margin:0 auto}
+.btn.primary:active{box-shadow:0 4px 14px rgba(34,211,238,.3)}
+.btn.ghost{background:transparent}
+.btn.grow2{flex:2}
+
+/* ---------- result ---------- */
+.result{text-align:center;padding:8px 0;animation:rise .4s both}
+.result .big{font-size:26px;font-weight:800;margin:4px 0 2px;letter-spacing:.5px}
+.result .sub{color:var(--dim);font-size:13px;margin-bottom:16px}
+.bigstars{font-size:38px;letter-spacing:9px;color:rgba(255,255,255,.13);margin:6px 0 14px;line-height:1}
+.bigstars i{font-style:normal;color:var(--am);text-shadow:0 0 22px rgba(251,191,36,.55);display:inline-block;animation:starIn .5s cubic-bezier(.2,1.8,.4,1) both}
+.bigstars i:nth-child(1){animation-delay:.05s}
+.bigstars i:nth-child(2){animation-delay:.18s}
+.bigstars i:nth-child(3){animation-delay:.31s}
+@keyframes starIn{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.sbox{border:1px solid var(--line);border-radius:14px;padding:12px 6px;background:var(--panel2)}
+.sbox b{display:block;font-size:19px;font-family:var(--mono);letter-spacing:.5px}
+.sbox span{font-size:10.5px;color:var(--dim);letter-spacing:.6px}
+
+.reviewlist{display:flex;flex-direction:column;gap:10px;text-align:left;margin-top:6px}
+.rv{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:rgba(248,113,113,.045)}
+.rv .rq{font-size:13.5px;font-weight:600;margin-bottom:7px;line-height:1.6}
+.rv .ra{font-size:12.5px;color:var(--gr);font-family:var(--mono);margin-bottom:6px;word-break:break-word}
+.rv .re{font-size:12.5px;color:var(--dim);line-height:1.7}
+.rv .re code{font-family:var(--mono);font-size:11.5px;color:var(--cy);background:rgba(34,211,238,.1);padding:1px 5px;border-radius:5px}
+
+/* ---------- cheat sheet ---------- */
+.cheat-w{display:flex;flex-direction:column;gap:14px}
+.csec{border:1px solid var(--line);border-radius:16px;padding:15px 16px;background:var(--panel)}
+.csec h4{margin:0 0 10px;font-size:13px;letter-spacing:1.2px;color:var(--accent,var(--cy));text-transform:uppercase;font-weight:700}
+.csec ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+.csec li{font-size:13.5px;line-height:1.7;color:#c3d0e2}
+.csec code{
+  font-family:var(--mono);font-size:12px;background:rgba(34,211,238,.11);color:var(--cy);
+  padding:1.5px 6px;border-radius:6px;border:1px solid rgba(34,211,238,.18);word-break:break-all;
+}
+.csec b{color:var(--txt)}
+
+/* ---------- misc ---------- */
+.empty{text-align:center;color:var(--dim);font-size:13.5px;padding:44px 20px;border:1px dashed var(--line);border-radius:16px}
+.footer{text-align:center;margin-top:34px;font-size:11.5px;color:rgba(138,155,182,.6);line-height:2}
+.linkbtn{background:none;border:none;color:rgba(138,155,182,.75);font-family:inherit;font-size:11.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.toast{
+  position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  z-index:200;padding:12px 20px;border-radius:14px;font-size:13.5px;font-weight:600;
+  background:linear-gradient(140deg,rgba(251,191,36,.96),rgba(245,158,11,.96));color:#1a1000;
+  box-shadow:0 12px 34px rgba(0,0,0,.5);opacity:0;transition:.35s cubic-bezier(.2,.8,.2,1);pointer-events:none;
+  max-width:86vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+"use strict";
+
+/* =========================================================
+   数据：关卡 · 知识卡 · 题库
+   ========================================================= */
+const LEVELS = [
+{
+  id:"ad", name:"域服务 AD DS", en:"ACTIVE DIRECTORY DOMAIN SERVICES",
+  icon:"🏰", accent:"#22d3ee", tag:"第 1 关",
+  desc:"把一台独立服务器变成域的“大脑”：建林、加域、管复制。",
+  cheat:[
+    {t:"层次结构",items:[
+      "<b>林 Forest</b> › <b>树 Tree</b> › <b>域 Domain</b> › <b>组织单位 OU</b>",
+      "域 = 安全边界 + 集中管理；OU = 委派管理与组策略链接的最小单位",
+      "<b>全局编录 GC</b>：保存林中所有对象的<b>部分属性</b>，负责跨域查询与通用组成员解析",
+      "林中第一台 DC 自动持有全部 5 个 FSMO 角色"
+    ]},
+    {t:"FSMO 五种操作主机",items:[
+      "林级：<b>架构主机</b> Schema Master、<b>域命名主机</b> Domain Naming Master",
+      "域级：<b>RID 主机</b>、<b>PDC 模拟器</b>、<b>基础结构主机</b> Infrastructure Master",
+      "全局编录（GC）是独立角色，<b>不属于</b> FSMO"
+    ]},
+    {t:"部署要点",items:[
+      "先把 IP 设为静态，<b>DNS 首选指向本机</b>（第一台 DC 只能指自己）",
+      "两步走：<code>Install-WindowsFeature AD-Domain-Services</code> → <code>Install-ADDSForest</code>",
+      "安装过程中要提供 DSRM（目录服务还原模式）密码",
+      "客户端加域前，DNS 必须能解析域控的 <b>SRV 记录</b>"
+    ]},
+    {t:"常用命令",items:[
+      "<code>dcdiag /v</code> — DC 综合健康检查；<code>dcdiag /test:dns</code> — 专查 DNS",
+      "<code>netdom query fsmo</code> — 查看 5 个 FSMO 持有者",
+      "<code>repadmin /replsummary</code> — 复制状态汇总",
+      "<code>nltest /dsgetdc:corp.local</code> — 定位域控",
+      "<code>dsquery user -name *</code> — 查询目录对象"
+    ]},
+    {t:"复制节奏",items:[
+      "站内复制默认约 <b>15 秒</b> 触发（KCC 自动生成连接）",
+      "站点间复制由<b>站点链接</b>决定，默认 <b>180 分钟</b>"
+    ]}
+  ],
+  questions:[
+    {t:"single",tag:"部署准备",
+     q:"部署林中的第一台域控制器之前，服务器的「首选 DNS 服务器」应该设置为什么？",
+     o:["8.8.8.8（公共 DNS）","网关地址","本机的静态 IP 地址","留空，由 DHCP 自动获取"],
+     a:2,
+     e:"第一台 DC 提升后自身就是 DNS，没有其他服务器可指，必须指向自己（本机 IP 或 127.0.0.1）。指向公共 DNS 会导致域内 <b>SRV 记录</b>解析失败，加域必然失败。"},
+
+    {t:"single",tag:"命令行",
+     q:"在 Windows Server 2019 中，把服务器提升为新林的域控制器，应使用哪条 PowerShell 命令？",
+     o:["dcpromo","Install-ADDSForest","Add-ADDSDomain","New-ADDomainController"],
+     a:1,
+     e:"<code>dcpromo</code> 从 Server 2012 起已废弃。新建林用 <code>Install-ADDSForest</code>，加入已有域用 <code>Install-ADDSDomainController</code>。"},
+
+    {t:"multi",tag:"部署准备",
+     q:"部署 AD DS 前，下列哪些是必须准备的？（多选）",
+     o:["为服务器配置静态 IP","把 DNS 指向未来的域控本身","准备目录服务还原模式（DSRM）密码","安装 IIS 角色","域管理员密码符合密码策略"],
+     a:[0,1,2,4],
+     e:"IIS 与域服务无关。安装向导会强制要求 DSRM 密码，域管理员密码也必须满足默认密码策略（长度 ≥7、含复杂度）。"},
+
+    {t:"single",tag:"FSMO",
+     q:"下列哪一项「不是」FSMO 五种操作主机角色之一？",
+     o:["架构主机 Schema Master","域命名主机 Domain Naming Master","全局编录服务器 Global Catalog","RID 主机 RID Master","基础结构主机 Infrastructure Master"],
+     a:2,
+     e:"FSMO 五角色：架构主机、域命名主机（林级）；RID 主机、PDC 模拟器、基础结构主机（域级）。<b>全局编录是另一种角色</b>，虽然重要但不属于 FSMO。"},
+
+    {t:"single",tag:"命令行",
+     q:"哪条命令可以列出当前域中 5 个 FSMO 角色的持有者？",
+     o:["dcdiag /v","netdom query fsmo","repadmin /showrepl","gpresult /r"],
+     a:1,
+     e:"<code>netdom query fsmo</code> 直接列出五个角色。<code>dcdiag</code> 做健康检查，<code>repadmin</code> 看复制，<code>gpresult</code> 看组策略。"},
+
+    {t:"single",tag:"故障排查",
+     q:"客户端加入域时提示「找不到网络路径 / 无法联系域」，最先应该检查什么？",
+     o:["客户端是否安装了 .NET Framework","客户端的 DNS 是否指向域控制器","域控是否开启了远程桌面","客户端是否已加入工作组"],
+     a:1,
+     e:"加域依赖 DNS 里的 SRV 记录定位 DC。客户端 DNS 指到公共 DNS 是最常见的原因。可用 <code>nslookup -type=SRV _ldap._tcp.dc._msdcs.域名</code> 验证。"},
+
+    {t:"single",tag:"核心概念",
+     q:"全局编录（GC）服务器最核心的作用是？",
+     o:["保存本域所有对象的全部属性","保存林中所有域对象的部分属性，支持跨域查询与登录","负责分配 RID 号段","负责生成组策略"],
+     a:1,
+     e:"GC 存的是<b>部分属性副本</b>（常用属性），用于跨域搜索和通用组成员身份解析。RID 号段分配是 RID Master 的工作。"},
+
+    {t:"order",tag:"部署流程",
+     q:"请按正确顺序排列「新建林中第一台域控，并让客户端加入域」的步骤。",
+     o:["为服务器配置静态 IP，DNS 指向自身",
+        "安装 AD DS 角色（Install-WindowsFeature AD-Domain-Services）",
+        "运行 Install-ADDSForest 提升为新林域控",
+        "重启服务器，用域管理员账户登录",
+        "把客户端 DNS 指向域控后执行加入域"],
+     e:"常见错误是把「装角色」和「提升」当成一步，或者最后才去配 DNS。DNS 必须最先配好，加域永远是最后一步。"},
+
+    {t:"single",tag:"RODC",
+     q:"只读域控制器（RODC）最适合部署在什么场景？",
+     o:["总部机房，承担主要登录压力","物理安全无法保障的分支机构","需要承担架构主机角色的服务器","需要运行证书服务的服务器"],
+     a:1,
+     e:"RODC 只读、可缓存凭据、可委派本地管理员，适合安全性差的分支机构。它<b>不能承担 FSMO 角色</b>。"},
+
+    {t:"fill",tag:"命令行",
+     q:"命令行工具，用于对域控制器做综合健康检查（只填命令名，不带参数）。",
+     a:["dcdiag"],
+     hint:"d 开头，7 个字母",
+     e:"<code>dcdiag /v</code> 输出详细检查项；<code>dcdiag /test:dns</code> 专门检查 DNS 是否满足 AD 要求。"},
+
+    {t:"single",tag:"核心概念",
+     q:"组织单位（OU）与安全组最本质的区别是？",
+     o:["OU 用于委派管理和链接组策略，组用于分配权限","两者完全等价，只是叫法不同","组可以链接组策略，OU 只能放用户","OU 只能存放计算机账户"],
+     a:0,
+     e:"OU 是<b>容器</b>，是组策略链接和委派管理的最小单位；组是<b>安全主体</b>，用于给资源赋权。二者不可混用。"},
+
+    {t:"single",tag:"复制",
+     q:"同一站点内两台域控制器之间，AD 复制的默认间隔约为？",
+     o:["15 秒","5 分钟","180 分钟","24 小时"],
+     a:0,
+     e:"站内复制由 KCC 自动生成连接，默认约 <b>15 秒</b> 触发一次变化通知；站点间复制由站点链接决定，默认 <b>180 分钟</b>。"}
+  ]
+},
+
+{
+  id:"pki", name:"证书服务 AD CS", en:"ACTIVE DIRECTORY CERTIFICATE SERVICES",
+  icon:"📜", accent:"#a78bfa", tag:"第 2 关",
+  desc:"搭一套 PKI：签证书、发证书、让浏览器不再报警告。",
+  cheat:[
+    {t:"CA 类型怎么选",items:[
+      "<b>企业 CA</b>：必须加入域，集成 AD，支持证书模板、自动注册、默认自动批准",
+      "<b>独立 CA</b>：可脱离域工作，申请需管理员<b>手动颁发</b>，常用于离线根或对外系统",
+      "<b>根 CA</b> 自签名，位于层次顶端；<b>从属 CA</b> 由上级 CA 签发"
+    ]},
+    {t:"部署流程",items:[
+      "安装角色服务：<code>AD-Certificate</code>，建议同时装<b>证书颁发机构 Web 注册</b>",
+      "配置：<code>Install-AdcsCertificationAuthority</code> 或服务器管理器 → 配置 AD CS",
+      "Web 注册页面：<code>http://CA服务器/certsrv</code>",
+      "在「证书模板」控制台复制并<b>发布</b>所需模板"
+    ]},
+    {t:"自动注册",items:[
+      "条件：<b>企业 CA</b> + 模板已发布且授予「注册」权限 + 组策略配置「证书自动注册」",
+      "计算机证书走「计算机配置 → 安全设置 → 公钥策略」"
+    ]},
+    {t:"吊销与信任",items:[
+      "<b>CRL</b> 证书吊销列表、<b>增量 CRL</b>、<b>OCSP</b> 在线状态协议",
+      "客户端验证失败提示「无法检查吊销状态」，多半是 <b>CDP 分发点</b>不可访问",
+      "要消除 HTTPS 警告，客户端需把<b>根 CA 证书</b>装进「受信任的根证书颁发机构」"
+    ]},
+    {t:"证书格式与用途",items:[
+      "<code>.cer / .crt / .p7b</code> — 只有公钥证书",
+      "<code>.pfx</code> — 含<b>私钥</b>，导入 IIS 必须用它",
+      "数字签名保<b>完整性 + 不可否认性</b>；加密保<b>机密性</b>"
+    ]}
+  ],
+  questions:[
+    {t:"single",tag:"CA 类型",
+     q:"企业 CA 与独立 CA 最根本的区别是？",
+     o:["企业 CA 必须装在域控上，独立 CA 不能加入域","企业 CA 集成 AD，可用证书模板自动注册；独立 CA 不依赖 AD，需手动审批","独立 CA 不能签发 Web 服务器证书","企业 CA 只能签发根证书"],
+     a:1,
+     e:"企业 CA 依赖 AD 发布模板、支持自动注册、默认自动批准；独立 CA 可脱离域工作，申请需要管理员手动颁发。"},
+
+    {t:"single",tag:"PKI 层次",
+     q:"在证书层次结构中，处于最顶层、自签名且被下级 CA 信任的是？",
+     o:["从属 CA","根 CA","注册机构 RA","OCSP 响应器"],
+     a:1,
+     e:"根 CA 的证书是<b>自签名</b>的，它构成信任链的起点。从属 CA 的证书由上级 CA 签发。"},
+
+    {t:"single",tag:"证书模板",
+     q:"为 IIS 网站申请 HTTPS 证书，应选择哪种证书模板？",
+     o:["用户","计算机","Web 服务器","代码签名"],
+     a:2,
+     e:"「Web 服务器」模板包含<b>服务器身份验证</b>用途，还可以在「主题」里配置 SAN（主题备用名称）填多个域名。"},
+
+    {t:"single",tag:"证书格式",
+     q:"要把证书连同私钥一起导出，以便导入 Web 服务器，应选择哪种格式？",
+     o:[".cer（Base64）",".crt",".pfx（PKCS#12）",".p7b"],
+     a:2,
+     e:"只有 <code>.pfx</code> 会把私钥一起打包。cer / crt / p7b 都只有公钥证书，导入 IIS 时无法完成 SSL 绑定。"},
+
+    {t:"single",tag:"信任链",
+     q:"浏览器访问 HTTPS 站点出现证书警告，客户端要消除警告需要安装什么？",
+     o:["服务器的 Web 服务器证书","签发该证书的根 CA 证书到「受信任的根证书颁发机构」","CRL 文件","OCSP 响应"],
+     a:1,
+     e:"信任链的根必须被客户端信任。把根 CA 证书导入「受信任的根证书颁发机构」后，整条链即可验证通过。"},
+
+    {t:"fill",tag:"Web 注册",
+     q:"企业 CA 安装 Web 注册角色服务后，默认的注册页面路径是 http://CA服务器/______ （填路径名）。",
+     a:["certsrv"],
+     hint:"c 开头，7 个字母",
+     e:"即 <code>http://CA服务器/certsrv</code>。赛项里常用它演示手动申请、下载证书链。"},
+
+    {t:"multi",tag:"吊销机制",
+     q:"下列哪些属于证书吊销状态的发布或查询机制？（多选）",
+     o:["CRL 证书吊销列表","增量 CRL","OCSP 在线证书状态协议","SAN 主题备用名称"],
+     a:[0,1,2],
+     e:"SAN 是证书里的扩展字段（放多个域名），与吊销无关。CRL/增量 CRL 是「列表」，OCSP 是「实时查询」。"},
+
+    {t:"order",tag:"部署流程",
+     q:"按顺序排列「部署企业根 CA，并让域内计算机自动获得证书」的步骤。",
+     o:["安装 AD CS 角色服务（证书颁发机构 + Web 注册）",
+        "配置 CA：选择「企业根 CA」并生成私钥",
+        "在证书模板控制台复制并发布所需模板",
+        "通过组策略配置「证书自动注册」策略",
+        "在客户端用证书控制台或 certutil 验证已自动注册"],
+     e:"顺序的关键：模板必须先<b>发布</b>，组策略里的自动注册才有东西可申请；最后才是验证。"},
+
+    {t:"single",tag:"自动注册",
+     q:"实现「域内计算机自动申请并续订计算机证书」，最关键的组合是？",
+     o:["企业 CA + 组策略自动注册策略","独立 CA + 手动 Web 注册","根 CA + OCSP","从属 CA + CRL 分发点"],
+     a:0,
+     e:"自动注册依赖两件事：<b>企业 CA</b>（能读 AD、用模板、自动批准）+ <b>组策略</b>启用自动注册并指定模板。"},
+
+    {t:"single",tag:"密码学基础",
+     q:"数字签名主要保证的是？",
+     o:["机密性","完整性与不可否认性","可用性","带宽优化"],
+     a:1,
+     e:"签名保证内容没被篡改（完整性）且签名者无法抵赖（不可否认性）。机密性靠公钥加密实现，两者是不同用途。"},
+
+    {t:"single",tag:"CA 选型",
+     q:"独立 CA 更适合下列哪种场景？",
+     o:["需要在域内实现证书自动注册","为非域环境或对外系统签发证书，或做离线根 CA","需要基于模板快速颁发大量用户证书","需要与组策略深度集成"],
+     a:1,
+     e:"独立 CA 不依赖 AD，可以放在工作组或隔离网络里做离线根，安全性更高，但代价是需要人工审批。"},
+
+    {t:"single",tag:"故障排查",
+     q:"客户端验证证书时提示「无法检查吊销状态」，最可能的原因是？",
+     o:["证书模板选错了","CRL 分发点（CDP）地址客户端无法访问","CA 的私钥丢失","证书的 SAN 字段为空"],
+     a:1,
+     e:"客户端会按证书里的 <b>CDP 地址</b>去下载 CRL。如果该 URL（常见如 <code>http://CA/certenroll/...</code>）不可达，就会报吊销检查失败。"}
+  ]
+},
+
+{
+  id:"gpo", name:"组策略 GPO", en:"GROUP POLICY OBJECTS",
+  icon:"⚙️", accent:"#34d399", tag:"第 3 关",
+  desc:"用一条策略管住一百台机器：优先级、继承、筛选、环回。",
+  cheat:[
+    {t:"应用顺序 LSDOU",items:[
+      "本地 Local → 站点 Site → 域 Domain → 组织单位 OU",
+      "后应用的<b>覆盖</b>先应用的，所以 OU 级优先级最高（无强制时）",
+      "同一 OU 多个 GPO：链接顺序数字<b>越小优先级越高</b>（最后处理）"
+    ]},
+    {t:"继承与强制",items:[
+      "<b>阻止继承</b> Block Inheritance：下级 OU 拒绝上级 GPO",
+      "<b>强制</b> Enforced：优先级高于「阻止继承」，仍然生效"
+    ]},
+    {t:"作用范围",items:[
+      "<b>安全组筛选</b>：只有组内对象应用（默认 Authenticated Users）",
+      "<b>WMI 筛选器</b>：按硬件/系统条件筛选，如只对笔记本生效",
+      "<b>环回处理</b>：用户配置按<b>计算机</b>所在 OU 来取（合并 / 替换两种模式），机房、终端服务器常用"
+    ]},
+    {t:"计算机 vs 用户",items:[
+      "计算机配置跟随<b>计算机对象</b>所在 OU；用户配置跟随<b>用户对象</b>所在 OU——可以不在同一个 OU",
+      "启动脚本在<b>计算机启动</b>时运行；登录脚本在<b>用户登录</b>时运行"
+    ]},
+    {t:"关键位置",items:[
+      "域账户密码策略、账户锁定策略 → <b>默认域策略</b>（域级别，全局唯一生效）",
+      "DC 的安全设置（用户权限分配等） → <b>默认域控制器策略</b>"
+    ]},
+    {t:"排查命令",items:[
+      "<code>gpupdate /force</code> — 立即刷新",
+      "<code>gpresult /r</code> — 查看已应用的 GPO 列表",
+      "<code>gpresult /h report.html</code> — 导出 HTML 报告（赛项常用截图取证）",
+      "GPMC 里的「组策略建模 / 组策略结果」可做模拟与实测"
+    ]}
+  ],
+  questions:[
+    {t:"order",tag:"优先级",
+     q:"组策略的应用顺序（LSDOU）是？",
+     o:["本地计算机策略","站点","域","组织单位 OU"],
+     e:"后应用的覆盖先应用的，所以 OU 级策略优先级最高（在未被强制覆盖的前提下）。"},
+
+    {t:"single",tag:"链接顺序",
+     q:"同一个 OU 上链接了多个 GPO，「链接顺序」为 1 和 2，哪个最终生效（优先级更高）？",
+     o:["顺序 1（数字小）","顺序 2（数字大）","随机","两个冲突会报错"],
+     a:0,
+     e:"GPMC 中链接顺序 <b>1 为最高优先级</b>，最后处理，因此覆盖顺序 2 的设置。这个「数字小=优先级高」容易记反。"},
+
+    {t:"single",tag:"继承",
+     q:"上级 OU 设置了「阻止继承」后，其中某个 GPO 被标记为「强制(Enforced)」，结果是？",
+     o:["该 GPO 依然生效，强制优先于阻止继承","该 GPO 完全不生效","只对计算机配置生效","只对用户配置生效"],
+     a:0,
+     e:"强制（Enforced）的优先级高于阻止继承，即使下级设了阻止继承，它依然会应用下来。"},
+
+    {t:"single",tag:"排查命令",
+     q:"想查看当前用户和计算机实际应用了哪些组策略，应使用？",
+     o:["gpupdate /force","gpresult /r","gpedit.msc","dcdiag /v"],
+     a:1,
+     e:"<code>gpresult /r</code> 列出已应用的 GPO；<code>gpupdate /force</code> 只是立即刷新；<code>gpedit.msc</code> 是编辑器。"},
+
+    {t:"single",tag:"排查命令",
+     q:"修改完组策略后想让其立即生效，应执行？",
+     o:["gpresult /r","gpupdate /force","secedit /refresh","net user /sync"],
+     a:1,
+     e:"<code>gpupdate /force</code> 立即重新应用全部策略。用户配置部分在已有登录会话中可能需要注销重登才完全生效。"},
+
+    {t:"single",tag:"安全策略",
+     q:"域账户的密码策略（长度、复杂度、有效期）必须在哪里配置才真正生效？",
+     o:["任意 OU 上链接的 GPO","域级别，即默认域策略（Default Domain Policy）","默认域控制器策略","本地安全策略"],
+     a:1,
+     e:"域账户的密码策略全局只能有一份，必须在域级别生效。在 OU 上配置的密码策略只影响该 OU 内的<b>本地账户</b>，对域账户无效。"},
+
+    {t:"multi",tag:"作用范围",
+     q:"下列哪些可以作为组策略的应用范围或筛选条件？（多选）",
+     o:["链接到站点 / 域 / OU","安全组筛选","WMI 筛选器","环回处理","DNS 区域传送"],
+     a:[0,1,2,3],
+     e:"DNS 区域传送与组策略无关。前四项是 GPO 作用范围的四种主要手段。"},
+
+    {t:"single",tag:"环回处理",
+     q:"组策略「环回处理」的作用是？",
+     o:["让用户配置按计算机对象所在 OU 来处理","加速组策略下载","让计算机策略对用户生效","把策略缓存到本地"],
+     a:0,
+     e:"环回用于机房、教室、终端服务器：不管谁登录，都按这台<b>计算机</b>所在 OU 的用户配置来。分「合并」和「替换」两种模式。"},
+
+    {t:"single",tag:"脚本",
+     q:"「计算机配置 → Windows 设置 → 脚本 → 启动」中的脚本什么时候执行？",
+     o:["用户登录时","计算机启动时","每次组策略刷新时","关机时"],
+     a:1,
+     e:"启动脚本随计算机启动执行；登录脚本在「用户配置」下，随用户登录执行。两者不要混。"},
+
+    {t:"single",tag:"故障排查",
+     q:"部门 OU 里的用户反映桌面壁纸策略没生效，但同一 OU 里的计算机策略都正常。最可能的原因是？",
+     o:["用户账户对象不在该 OU 中，用户配置跟随用户对象所在 OU","壁纸文件太大","客户端未安装 .NET Framework","DNS 配置错误"],
+     a:0,
+     e:"计算机配置跟随计算机对象，用户配置跟随用户对象，两者完全独立，可以位于不同 OU。这是组策略排查的第一现场。"},
+
+    {t:"fill",tag:"排查命令",
+     q:"把组策略应用结果导出为 HTML 报告的命令是 gpresult ______ report.html（填参数）。",
+     a:["/h","-h"],
+     hint:"斜杠加一个字母",
+     e:"<code>gpresult /h report.html</code> 会生成带图表的 HTML 报告，能直接看到每条策略的胜出者，赛项里常用来取证。"},
+
+    {t:"single",tag:"软件部署",
+     q:"软件部署策略里，「发布(Publish)」与「分配(Assign)」的区别是？",
+     o:["发布是强制安装，分配是可选安装","发布到用户时会出现在「程序和功能」中由用户自行安装；分配则自动安装","两者完全相同","发布只对计算机生效"],
+     a:1,
+     e:"发布（Publish）只对用户有效，用户可自行选择安装；分配（Assign）对计算机是自动安装，对用户则出现在开始菜单快捷方式。"},
+
+    {t:"single",tag:"关键位置",
+     q:"默认域控制器策略（Default Domain Controllers Policy）主要用来配置？",
+     o:["域账户密码策略","域控制器的安全设置，如用户权限分配","所有用户的桌面设置","软件分发"],
+     a:1,
+     e:"它只管 DC 这台机器本身的安全设置。密码策略、账户锁定策略在<b>默认域策略</b>里。"}
+  ]
+},
+
+{
+  id:"dfs", name:"DFS 分布式文件系统", en:"DISTRIBUTED FILE SYSTEM",
+  icon:"🗂️", accent:"#38bdf8", tag:"第 4 关",
+  desc:"统一命名 + 多机复制，让分支和总部像在同一台服务器上。",
+  cheat:[
+    {t:"两大组件",items:[
+      "<b>DFS 命名空间</b>：统一的逻辑路径 <code>\\\\corp.local\\public</code>，屏蔽后端物理服务器",
+      "<b>DFS 复制 DFSR</b>：多台服务器之间同步文件，替代老式 FRS"
+    ]},
+    {t:"命名空间类型",items:[
+      "<b>基于域</b>：信息存 AD，可部署多台命名空间服务器，<b>支持故障转移</b>；访问用 <code>\\\\域\\命名空间</code>",
+      "<b>独立</b>：不依赖 AD，但只能部署在单台服务器上，<b>单点故障</b>；访问用 <code>\\\\服务器\\命名空间</code>"
+    ]},
+    {t:"复制要点",items:[
+      "创建复制组时指定<b>主要成员</b>，初始复制以它作为权威数据源",
+      "拓扑：<b>集散（中心辐射）</b>适合总部-分支；<b>全互联</b>适合少量对等服务器",
+      "DFSR 使用 <b>RDC 远程差分压缩</b>，只传文件变化的部分",
+      "客户端引用优先选<b>同站点</b>的文件夹目标"
+    ]},
+    {t:"权限模型",items:[
+      "最终权限 = <b>共享权限 ∩ NTFS 权限</b>（取更严格者）",
+      "一个命名空间文件夹可以配多个目标，实现负载分担与就近访问"
+    ]},
+    {t:"常用命令",items:[
+      "<code>dfsrdiag ReplicationState</code> — 查看复制状态",
+      "<code>dfsrdiag backlog</code> / <code>Get-DfsrBacklog</code> — 查看积压文件",
+      "<code>dfsutil</code> — 命名空间诊断",
+      "角色服务：<code>FS-DFS-Namespace</code>、<code>FS-DFS-Replication</code>"
+    ]}
+  ],
+  questions:[
+    {t:"single",tag:"核心作用",
+     q:"DFS 命名空间解决的核心问题是？",
+     o:["提高单台服务器的带宽","用统一的逻辑名称屏蔽后端物理服务器，实现统一访问与故障切换","替代 NTFS 权限","替代 DNS"],
+     a:1,
+     e:"用户只记 <code>\\\\corp.local\\public</code>，后端换服务器、加服务器都不影响用户访问路径。"},
+
+    {t:"single",tag:"DFSR",
+     q:"DFS 复制（DFSR）相比老式 FRS 的关键优势是？",
+     o:["只支持两台服务器","使用远程差分压缩（RDC），只传输文件变化的部分，支持多主机复制","不支持复制计划","只能在域内使用"],
+     a:1,
+     e:"RDC 让大文件中只改了一个字节时也只传变化块，大幅节省带宽；同时支持多主机、双向复制。"},
+
+    {t:"single",tag:"命名空间类型",
+     q:"基于域的命名空间相比独立命名空间的优势是？",
+     o:["不需要 AD","支持多台命名空间服务器，可故障转移，客户端通过域访问","配置更简单","支持更多文件夹"],
+     a:1,
+     e:"独立命名空间不依赖 AD，但只能部署在一台服务器上，一旦宕机用户全部不可访问。"},
+
+    {t:"order",tag:"部署流程",
+     q:"部署 DFS 复制的正确顺序。",
+     o:["安装「DFS 命名空间」与「DFS 复制」角色服务",
+        "创建复制组并指定所属域",
+        "把参与复制的成员服务器加入复制组",
+        "创建复制文件夹，选择主要成员作为初始数据源",
+        "设置复制拓扑（集散 / 全互联）与复制计划"],
+     e:"先有组，再有成员，再有文件夹，最后才是拓扑和计划。顺序错乱最常见的是忘了指定主要成员。"},
+
+    {t:"single",tag:"拓扑",
+     q:"「集散（中心辐射）」复制拓扑最适合什么场景？",
+     o:["两台服务器对等同步","总部与多个分支机构之间，总部为中心节点","互联网上的公网同步","单机备份"],
+     a:1,
+     e:"中心节点连所有分支，分支之间不直连，减少复制会话数量，适合分支数量多的企业。"},
+
+    {t:"single",tag:"客户端引用",
+     q:"一个命名空间文件夹配置了多个文件夹目标，客户端优先访问哪个？",
+     o:["随机选择","与客户端同站点的目标","带宽最小的","最后添加的"],
+     a:1,
+     e:"客户端引用按<b>站点优先</b>排序；没有同站点目标时才按成本顺序或随机选择。这正是「就近访问」的实现方式。"},
+
+    {t:"fill",tag:"排查命令",
+     q:"查看 DFSR 复制组当前复制状态的命令是 dfsrdiag ______ ReplicationState（填子命令）。",
+     a:["replicationstate"],
+     hint:"就是 ReplicationState 本身，全小写",
+     e:"<code>dfsrdiag ReplicationState /member:服务器名</code>。检查积压可用 <code>dfsrdiag backlog</code> 或 <code>Get-DfsrBacklog</code>。"},
+
+    {t:"multi",tag:"角色服务",
+     q:"部署 DFS 需要安装哪些角色服务？（多选）",
+     o:["DFS 命名空间","DFS 复制","Web 服务器 IIS",".NET Framework 3.5"],
+     a:[0,1],
+     e:"是否需要命名空间取决于是否要做统一路径；只做复制的话其实只需要 DFS 复制。但赛项通常两者都装。"},
+
+    {t:"single",tag:"复制组",
+     q:"创建复制组时指定的「主要成员」的作用是？",
+     o:["负责分配 RID","初始复制时作为权威数据源，其他成员从它同步初始数据","负责组策略下发","只读副本，不参与复制"],
+     a:1,
+     e:"初始复制（Initial Replication）需要一个权威源。选错主要成员会导致旧数据覆盖新数据，这是 DFS 最经典的坑。"},
+
+    {t:"single",tag:"权限",
+     q:"用户通过共享访问文件时，最终生效的权限是？",
+     o:["共享权限与 NTFS 权限中较宽松的","共享权限与 NTFS 权限的交集，也就是更严格的那个","只看 NTFS 权限","只看共享权限"],
+     a:1,
+     e:"两者取交集。所以「共享权限全开但 NTFS 拒绝」和「NTFS 全开但共享只读」都会导致访问受限。"},
+
+    {t:"single",tag:"路径解析",
+     q:"\\\\corp.local\\public\\finance\\report.xlsx 中，public 和 finance 分别是什么？",
+     o:["public 是命名空间，finance 是命名空间中的文件夹","public 是文件夹，finance 是服务器名","两者都是共享名","public 是域，finance 是站点"],
+     a:0,
+     e:"基于域的命名空间格式是 <code>\\\\域\\命名空间\\文件夹\\...</code>。命名空间根下面还可以挂多层文件夹和目标。"},
+
+    {t:"single",tag:"方案设计",
+     q:"分支机构用户打开总部文件很慢，最合理的优化是？",
+     o:["给总部服务器加内存","在分支机构部署一台加入复制组的服务器，并把命名空间文件夹目标指向它","关闭 NTFS 权限","改用 FTP"],
+     a:1,
+     e:"本地副本 + 同站点引用，让分支用户走局域网；再配合复制计划在非工作时间同步，兼顾体验与带宽。"}
+  ]
+},
+
+{
+  id:"iis", name:"IIS 与 ASP", en:"INTERNET INFORMATION SERVICES",
+  icon:"🌐", accent:"#f472b6", tag:"第 5 关",
+  desc:"把网站跑起来：应用程序池、绑定、权限，以及那几个经典报错。",
+  cheat:[
+    {t:"三层结构",items:[
+      "<b>网站</b> → 绑定 IP:端口:主机头；<b>应用程序池</b> → 进程隔离与 .NET 版本；<b>物理路径</b> → NTFS 权限",
+      "默认站点 <code>%SystemDrive%\\inetpub\\wwwroot</code>，默认端口 80 / 443",
+      "一个 IP 的 80 端口可发布多个站点，靠<b>主机头</b>区分（需 DNS 解析到同一 IP）"
+    ]},
+    {t:"让 ASP 跑起来",items:[
+      "安装 IIS 时勾选「ASP」功能（默认不装）",
+      "ASP 设置里启用<b>父路径</b> enableParentPaths（影响 Server.MapPath(\"../\")）",
+      "32 位 COM 组件 → 应用程序池启用「32 位应用程序」",
+      "配置<b>默认文档</b>，否则会 403.14"
+    ]},
+    {t:"权限",items:[
+      "匿名身份验证默认使用 <b>IUSR</b>；应用程序池标识默认 ApplicationPoolIdentity",
+      "网站目录通常授予 <b>IIS_IUSRS</b> 读取和执行"
+    ]},
+    {t:"经典错误码",items:[
+      "<b>403.14</b> — 未启用目录浏览且无默认文档",
+      "<b>401.3</b> — 已通过身份验证但 NTFS 权限拒绝",
+      "<b>500.19</b> — web.config 配置节不受支持 / 未安装对应模块 / 配置文件权限",
+      "<b>503</b> — 应用程序池已停止或正在回收"
+    ]},
+    {t:"常用命令",items:[
+      "<code>appcmd list site</code> / <code>appcmd add site</code>",
+      "PowerShell：<code>Import-Module WebAdministration</code>",
+      "日志默认在 <code>%SystemDrive%\\inetpub\\logs\\LogFiles</code>"
+    ]}
+  ],
+  questions:[
+    {t:"single",tag:"站点绑定",
+     q:"一台服务器只有一个 IP，要在一个 IIS 上用 80 端口发布多个网站，应使用？",
+     o:["不同的端口","主机头（HTTP Host 头）绑定","不同的应用程序池","不同的物理路径"],
+     a:1,
+     e:"多个站点共用 IP:80，通过<b>主机头</b>区分；同时要在 DNS 里把各域名都解析到同一 IP。这是赛项里必考的配置点。"},
+
+    {t:"single",tag:"错误码",
+     q:"访问网站返回 403.14，最可能的原因是？",
+     o:["未配置默认文档且未启用目录浏览","NTFS 权限不足","应用程序池已停止","证书过期"],
+     a:0,
+     e:"403.14 是「目录列表被拒绝」。要么加默认文档（如 index.html、default.asp），要么开启目录浏览。"},
+
+    {t:"single",tag:"错误码",
+     q:"访问静态文件返回 401.3，说明？",
+     o:["身份验证方式配置错误","IIS 已通过身份验证，但 NTFS 权限拒绝访问该文件","文件不存在","ASP 未安装"],
+     a:1,
+     e:"401 系列是「未授权」。401.3 特指 NTFS ACL 拒绝，检查网站目录是否给了 IIS_IUSRS 读取权限。"},
+
+    {t:"single",tag:"错误码",
+     q:"访问网站返回 500.19，通常是？",
+     o:["数据库连接失败","web.config 中配置节不受支持、缺少对应模块或配置文件权限问题","DNS 解析失败","端口被其他程序占用"],
+     a:1,
+     e:"最典型场景：代码里写了 <code>&lt;system.web&gt;</code> 却没安装 ASP.NET 功能。装好对应功能或改写配置节即可。"},
+
+    {t:"single",tag:"ASP 配置",
+     q:"ASP 页面中使用 Server.MapPath(\"../data\") 报错，需要开启什么？",
+     o:["目录浏览","父路径（enableParentPaths）","32 位应用程序","Windows 身份验证"],
+     a:1,
+     e:"ASP 默认禁止使用 <code>..</code> 访问上级目录，防止目录遍历。需在 ASP 设置里把「启用父路径」设为 True。"},
+
+    {t:"single",tag:"ASP 配置",
+     q:"32 位 COM 组件在 64 位 Windows 上调用失败，应在应用程序池设置中？",
+     o:["把 .NET CLR 版本改为「无托管代码」","启用「32 位应用程序」","把管道模式改为经典","设置空闲超时"],
+     a:1,
+     e:"启用 32 位应用程序后，工作进程会以 32 位运行，从而能加载 32 位组件。代价是内存上限约 2GB。"},
+
+    {t:"single",tag:"错误码",
+     q:"访问网站返回 503 Service Unavailable，最常见的原因是？",
+     o:["应用程序池已停止或正在回收","DNS 未解析","证书无效","默认文档缺失"],
+     a:0,
+     e:"503 表示服务不可用。先看应用程序池状态是不是「已停止」，再查事件查看器里的崩溃记录。"},
+
+    {t:"multi",tag:"综合配置",
+     q:"让 IIS 正常跑起一个 ASP 网站，通常需要做哪些配置？（多选）",
+     o:["安装 IIS 的 ASP 功能","设置默认文档","按需启用父路径","配置应用程序池与网站绑定","安装 SQL Server"],
+     a:[0,1,2,3],
+     e:"是否需要数据库取决于站点代码，不是 IIS 跑起 ASP 的必需项。前四项是标准动作。"},
+
+    {t:"fill",tag:"命令行",
+     q:"IIS 7 及以上提供的命令行管理工具是 ______ （只填命令名）。",
+     a:["appcmd"],
+     hint:"a 开头，6 个字母",
+     e:"常用：<code>appcmd list site</code>、<code>appcmd add site /name:... /physicalPath:...</code>。PowerShell 侧用 WebAdministration 模块。"},
+
+    {t:"single",tag:"身份验证",
+     q:"匿名访问网站时，IIS 默认使用的内置账户是？",
+     o:["IUSR","Network Service","LocalSystem","Administrator"],
+     a:0,
+     e:"匿名身份验证默认使用 <b>IUSR</b>；应用程序池标识默认是 <b>ApplicationPoolIdentity</b>。两者都会被 NTFS 检查。"},
+
+    {t:"order",tag:"部署流程",
+     q:"发布一个 ASP 网站的合理顺序。",
+     o:["安装 IIS 与 ASP 相关功能",
+        "创建应用程序池，设置 .NET 版本与 32 位选项",
+        "创建网站并配置绑定（IP、端口、主机头）",
+        "把网站文件放入物理路径并设置默认文档",
+        "为物理路径配置 NTFS 权限（IIS_IUSRS 读取和执行）",
+        "用浏览器访问验证"],
+     e:"先功能、再池、再站点、再文件、再权限、最后验证。权限放最后配是常见误区——先放文件再配权限更容易定位问题。"},
+
+    {t:"single",tag:"默认文档",
+     q:"多个默认文档同时存在时，IIS 按什么顺序返回？",
+     o:["按文件名字母顺序","按列表中从上到下的顺序，第一个存在的被返回","随机选择","按文件大小"],
+     a:1,
+     e:"默认文档是一个有序列表。若 index.html 在 default.asp 之上，访问目录时会优先返回 index.html。"},
+
+    {t:"single",tag:"日志",
+     q:"IIS 网站日志默认存放在哪里？",
+     o:["C:\\Windows\\System32\\LogFiles","C:\\inetpub\\logs\\LogFiles","C:\\Windows\\Logs\\IIS","网站根目录下的 logs"],
+     a:1,
+     e:"默认在 <code>%SystemDrive%\\inetpub\\logs\\LogFiles</code>，按站点 ID 分目录。排查访问来源、状态码分布必看这里。"}
+  ]
+},
+
+{
+  id:"boss", name:"综合实战", en:"FINAL BOSS · CROSS-DOMAIN TROUBLESHOOTING",
+  icon:"🏆", accent:"#fbbf24", tag:"BOSS 关", boss:true,
+  desc:"五个模块混合作战。真实故障场景，一步错步步错。",
+  cheat:[
+    {t:"排障思维",items:[
+      "<b>先定位层次</b>：DNS → 网络 → 服务 → 应用配置 → 权限",
+      "<b>先看日志</b>：事件查看器、IIS 日志、<code>dcdiag</code>、<code>gpresult /h</code>",
+      "<b>一次只改一个变量</b>，改完立即验证"
+    ]},
+    {t:"各模块第一现场",items:[
+      "加域失败 → 查客户端 DNS 与 SRV 记录",
+      "证书告警 → 查信任链、CDP、SAN 与有效期",
+      "策略不生效 → 分清计算机配置还是用户配置，查 <code>gpresult /r</code>",
+      "DFS 不同步 → 查复制组状态、复制计划、backlog",
+      "网站 5xx → 先看应用程序池状态，再读事件查看器"
+    ]}
+  ],
+  questions:[
+    {t:"single",tag:"AD · 故障",
+     s:"新装 Windows Server 2022，配置静态 IP 192.168.1.10，网关 192.168.1.1，首选 DNS 填了路由器 192.168.1.1。已成功提升为林中第一台域控。客户端加域时报错「找不到域」。",
+     q:"最可能的原因是什么？",
+     o:["IP 地址冲突","域控的 DNS 指向了路由器而不是自己，SRV 记录无法解析","没有安装 IIS 角色","服务器未激活"],
+     a:1,
+     e:"第一台 DC 的 DNS 必须指向自身。指向路由器后，<code>_ldap._tcp.dc._msdcs</code> 等 SRV 记录查不到，加域必然失败。"},
+
+    {t:"single",tag:"AD CS · 选型",
+     s:"域内 200 台成员服务器需要自动获得计算机证书，用于 IPSec 身份验证，运维只有 1 个人。",
+     q:"最省事且符合规范的方案是？",
+     o:["每台机器手动打开 certsrv 申请","部署企业 CA，并用组策略启用证书自动注册","部署独立 CA，逐台手动审批","每台机器导出 pfx 再分发"],
+     a:1,
+     e:"企业 CA + 组策略自动注册是唯一能规模化的方案，200 台手动申请不现实。"},
+
+    {t:"single",tag:"GPO · 环回",
+     s:"教室机房 60 台电脑，要求任何学生登录后桌面都被统一锁定，不能按学生自己的账户设置走。",
+     q:"应使用组策略的哪种机制？",
+     o:["安全组筛选","WMI 筛选器","环回处理（替换模式）","阻止继承"],
+     a:2,
+     e:"环回处理让用户配置按<b>计算机</b>所在 OU 来取。替换模式完全忽略用户自身 OU 的用户配置，最适合公共机房。"},
+
+    {t:"single",tag:"DFS · 方案",
+     s:"总部与 3 个分支机构需要共享同一套部门文件夹。任一站点断网时，本地用户仍要能读写自己的副本。",
+     q:"最佳方案是？",
+     o:["总部单台文件服务器 + 映射网络驱动器","基于域的 DFS 命名空间 + DFSR 复制到各分支","搭建 FTP 服务器","用云盘同步"],
+     a:1,
+     e:"命名空间提供统一路径，DFSR 提供各站点本地副本。断网时本地仍可访问，恢复后自动同步。"},
+
+    {t:"single",tag:"IIS · 故障",
+     s:"IIS 上新部署一个 ASP 站点，浏览器显示 500.19，事件查看器提示「无法读取配置文件的 configuration 节」。",
+     q:"最先应该检查什么？",
+     o:["是否安装了 ASP / ASP.NET 功能，web.config 中的配置节是否被支持","服务器磁盘空间","SSL 证书是否过期","应用程序池是否开启 32 位"],
+     a:0,
+     e:"500.19 几乎总是配置节问题。先确认功能有没有装全，再看配置节是否被锁定或拼写错误。"},
+
+    {t:"multi",tag:"AD · 排查",
+     s:"接手一台别人配好的域控，要做一次健康巡检。",
+     q:"下列哪些命令适合用来检查域控本身的状态？（多选）",
+     o:["dcdiag /v","repadmin /replsummary","netdom query fsmo","gpresult /r","ipconfig /flushdns"],
+     a:[0,1,2],
+     e:"gpresult 查的是客户端策略结果，flushdns 是清本机 DNS 缓存，都不属于 DC 健康巡检。前三项才是标准动作。"},
+
+    {t:"single",tag:"GPO · 故障",
+     s:"在部门 OU 上链接了「禁止访问控制面板」的 GPO，部门用户登录后确实打不开控制面板。但域管理员登录同一台电脑，仍然可以打开。",
+     q:"最合理的解释是？",
+     o:["策略只对 OU 内用户生效，域管理员账户不在该 OU 中","GPO 已损坏","必须重启域控","需要启用环回处理"],
+     a:0,
+     e:"用户配置只作用于 OU 内的用户对象。域管理员账户在 Users 容器里，不受该 GPO 约束——这是设计如此，不是故障。"},
+
+    {t:"single",tag:"DFS · 故障",
+     s:"两台服务器的 DFSR 复制组，A 上新增文件后 B 迟迟看不到，backlog 持续增长。",
+     q:"最应该先检查什么？",
+     o:["复制组的复制计划与带宽限制，以及复制是否被禁用","命名空间是否已创建","域功能级别","客户端 DNS 配置"],
+     a:0,
+     e:"backlog 只增不减，说明数据在排队等复制。先看复制计划和带宽限制（可能设成了非工作时间才复制），再看复制组是否被禁用。"},
+
+    {t:"single",tag:"AD CS · 故障",
+     s:"用户访问 https://www.corp.local 时浏览器提示证书不受信任，但同一个 CA 签发的其他站点访问正常。",
+     q:"最可能的原因？",
+     o:["根 CA 证书没有被信任","该证书的 SAN 中不包含 www.corp.local，或者证书已过期","Web 服务器没有加入域","443 端口被占用"],
+     a:1,
+     e:"同 CA 的其他站点正常，说明根证书信任链没问题。问题出在这张证书本身：名称不匹配或已过期。"},
+
+    {t:"order",tag:"IIS · HTTPS",
+     s:"需要为一个已加入域的新站点 a.corp.local 部署 HTTPS。",
+     q:"请排列正确的操作顺序。",
+     o:["在 CA 上确认「Web 服务器」模板可用并提交申请",
+        "申请证书时把 a.corp.local 填入主题备用名称（SAN）",
+        "从 CA 下载证书并导出为含私钥的 .pfx",
+        "在 IIS 中通过「服务器证书 → 导入」导入 pfx",
+        "在网站绑定中添加 https / 443 并选择该证书",
+        "浏览器访问验证证书链与域名"],
+     e:"关键点：SAN 必须包含实际访问的域名，否则即使证书链正常也会报名称不匹配；导入 IIS 必须用 pfx。"}
+  ]
+}
+];
+
+const BADGES = [
+  {id:"first",     icon:"🎯", name:"初入江湖", desc:"完成任意一关"},
+  {id:"ad3",       icon:"🏰", name:"域林之王", desc:"域服务关三星"},
+  {id:"pki3",      icon:"📜", name:"证书签发官", desc:"证书服务关三星"},
+  {id:"gpo3",      icon:"⚙️", name:"策略大师", desc:"组策略关三星"},
+  {id:"dfs3",      icon:"🗂️", name:"复制掌控者", desc:"DFS 关三星"},
+  {id:"iis3",      icon:"🌐", name:"Web 站长", desc:"IIS 关三星"},
+  {id:"all",       icon:"🧩", name:"全科通关", desc:"五关全部完成"},
+  {id:"perfect",   icon:"💎", name:"满分学霸", desc:"任意关卡全对"},
+  {id:"combo",     icon:"🔥", name:"连击达人", desc:"单关连击 ≥ 8"},
+  {id:"boss",      icon:"🏆", name:"大赛冠军", desc:"通过综合实战"}
+];
+
+const RANKS = [
+  {xp:0,    name:"见习技术员"},
+  {xp:200,  name:"网络管理员"},
+  {xp:450,  name:"系统工程师"},
+  {xp:750,  name:"高级运维"},
+  {xp:1050, name:"赛项选手"},
+  {xp:1300, name:"大赛冠军"}
+];
+
+/* =========================================================
+   状态
+   ========================================================= */
+const STORE_KEY = "netops-quest-v1";
+
+function blankState(){
+  const levels = {};
+  LEVELS.forEach(l => levels[l.id] = {stars:0, best:0, bestXp:0, done:false});
+  return {levels, badges:[], wrong:[]};
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return blankState();
+    const s = JSON.parse(raw);
+    const base = blankState();
+    if(s.levels) Object.keys(base.levels).forEach(k=>{ if(s.levels[k]) base.levels[k] = Object.assign(base.levels[k], s.levels[k]); });
+    base.badges = Array.isArray(s.badges) ? s.badges : [];
+    base.wrong  = Array.isArray(s.wrong)  ? s.wrong  : [];
+    return base;
+  }catch(e){ return blankState(); }
+}
+
+let state = load();
+
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* 给每道题生成稳定 id */
+LEVELS.forEach(lv => lv.questions.forEach((q,i)=>{ q._id = lv.id + "-" + i; }));
+
+const QMAP = {};
+LEVELS.forEach(lv => lv.questions.forEach(q => { QMAP[q._id] = {q, lv}; }));
+
+/* =========================================================
+   工具
+   ========================================================= */
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const norm = s => String(s).toLowerCase().replace(/\s+/g,"").replace(/[。，、,.；;：:]/g,"");
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function totalXp(){
+  return Object.values(state.levels).reduce((s,v)=>s+(v.bestXp||0),0);
+}
+function rankOf(xp){
+  let r = RANKS[0], next = null;
+  for(const it of RANKS){ if(xp >= it.xp) r = it; else { next = it; break; } }
+  return {cur:r, next};
+}
+function doneCount(){
+  return LEVELS.filter(l=>state.levels[l.id].done).length;
+}
+
+function toast(msg){
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add("show"));
+  setTimeout(()=>{ el.classList.remove("show"); setTimeout(()=>el.remove(),400); }, 1900);
+}
+
+/* =========================================================
+   首页
+   ========================================================= */
+let bossUnlocked = ()=> LEVELS.filter(l=>!l.boss).every(l=>state.levels[l.id].done);
+
+function renderHome(){
+  const xp = totalXp();
+  const {cur, next} = rankOf(xp);
+  const pct = next ? clamp((xp-cur.xp)/(next.xp-cur.xp)*100,0,100) : 100;
+  const finished = doneCount();
+
+  const cards = LEVELS.map(lv=>{
+    const st = state.levels[lv.id];
+    const locked = !!lv.boss && !bossUnlocked();
+    const stars = [0,1,2].map(i=> i<st.stars ? "<i>★</i>" : "★").join("");
+    const meta = st.done
+      ? `最佳 ${st.best}% · ${lv.questions.length} 题`
+      : `${lv.questions.length} 题 · 未通关`;
+    return `<div class="card ${lv.boss?"boss":""} ${locked?"locked":""}" data-level="${lv.id}"
+      style="--accent:${lv.accent};--accent-soft:${lv.accent}1f;--accent-line:${lv.accent}44">
+      ${!locked ? `<button class="cheatbtn" data-cheat="${lv.id}" aria-label="知识卡">📖</button>` : ""}
+      <div class="card-top">
+        <span class="icon">${locked?"🔒":lv.icon}</span>
+        <span class="tag">${lv.tag}</span>
+      </div>
+      <h3>${lv.name}</h3>
+      <div class="en">${lv.en}</div>
+      <p class="desc">${locked ? "通过前面五个关卡后解锁。" : lv.desc}</p>
+      <div class="stars">${stars}</div>
+      <div class="card-meta"><span>${meta}</span><span class="go">${locked?"未解锁":"开始 →"}</span></div>
+    </div>`;
+  }).join("");
+
+  const badgeHtml = BADGES.map(b=>{
+    const has = state.badges.includes(b.id);
+    return `<div class="badge ${has?"":"locked"}"><span class="bi">${b.icon}</span>
+      <div><div>${b.name}</div><small>${b.desc}</small></div></div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◈</span>
+        <div>
+          <h1>网络建设与运维</h1>
+          <p>云平台虚拟机 · 闯关实验室</p>
+        </div>
+      </div>
+      <div class="rankbox">
+        <div class="rankline"><span class="rank-name">${cur.name}</span><span class="rank-xp">${xp} XP</span></div>
+        <div class="xpbar"><i style="width:${pct}%"></i></div>
+      </div>
+    </header>
+
+    <div class="hero">
+      <h2>选一个模块，开始今天的实战。</h2>
+      <p>72 道题覆盖域服务、证书、组策略、DFS、IIS/ASP。答错自动进错题本，随时复习。</p>
+      <div class="hero-stats">
+        <div class="hstat"><b>${finished}/${LEVELS.length}</b><span>已通关</span></div>
+        <div class="hstat"><b>${state.badges.length}/${BADGES.length}</b><span>徽章</span></div>
+        <div class="hstat"><b>${state.wrong.length}</b><span>错题</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">关卡地图</div>
+    <div class="grid">${cards}</div>
+
+    <div class="section-title">成就</div>
+    <div class="badges">${badgeHtml}</div>
+
+    <div class="actionbar home">
+      <button class="btn ghost" data-act="review">📕 错题本${state.wrong.length?` (${state.wrong.length})`:""}</button>
+    </div>
+
+    <div class="footer">
+      进度保存在本机浏览器 · 换设备不会同步<br>
+      <button class="linkbtn" data-act="reset">重置全部进度</button>
+    </div>
+  `;
+}
+
+/* =========================================================
+   知识卡
+   ========================================================= */
+function renderCheat(levelId){
+  const lv = LEVELS.find(l=>l.id===levelId);
+  if(!lv){ renderHome(); return; }
+  app.innerHTML = `
+    <div class="gamehead">
+      <button class="iconbtn" data-act="home">←</button>
+      <div class="gtitle"><b>${lv.name} · 知识卡</b><span>先过一遍，再闯关</span></div>
+    </div>
+    <div class="cheat-w" style="--accent:${lv.accent}">
+      ${lv.cheat.map(sec=>`
+        <section class="csec" style="--accent:${lv.accent}">
+          <h4>${sec.t}</h4>
+          <ul>${sec.items.map(it=>`<li>${it}</li>`).join("")}</ul>
+        </section>`).join("")}
+    </div>
+    <div class="actionbar">
+      <button class="btn primary grow2" data-act="start" data-level="${lv.id}">开始闯关 →</button>
+    </div>
+  `;
+}
+
+/* =========================================================
+   答题会话
+   ========================================================= */
+let S = null; // session
+
+function prepQuestion(q){
+  const base = {q, t:q.t, s:q.s, text:q.q, e:q.e, tag:q.tag};
+  if(q.t === "single"){
+    const disp = shuffle(q.o.map((text,i)=>({text, orig:i})));
+    base.disp = disp;
+    base.correct = disp.findIndex(x=>x.orig === q.a);
+  } else if(q.t === "multi"){
+    const disp = shuffle(q.o.map((text,i)=>({text, orig:i})));
+    base.disp = disp;
+    base.correct = disp.map((x,i)=> q.a.includes(x.orig) ? i : -1).filter(i=>i>=0).sort((a,b)=>a-b);
+  } else if(q.t === "order"){
+    base.disp = shuffle(q.o.map((text,i)=>({text, orig:i})));
+  } else if(q.t === "fill"){
+    base.accept = q.a.map(norm);
+  }
+  return base;
+}
+
+function startLevel(levelId){
+  const lv = LEVELS.find(l=>l.id===levelId);
+  if(!lv) return false;
+  if(lv.boss && !bossUnlocked()){ toast("先把前面五个关卡通关吧"); return false; }
+  const qs = shuffle(lv.questions).map(prepQuestion);
+  S = {lv, qs, i:0, correct:0, combo:0, maxCombo:0, xp:0, results:[], answered:false, sel:new Set(), seq:[]};
+  renderGame();
+  return true;
+}
+
+function renderGame(){
+  const {lv, qs, i, combo} = S;
+  const item = qs[i];
+  const q = item.q;
+  const progress = (i / qs.length) * 100;
+
+  const typeLabel = {single:"单选", multi:"多选", order:"排序", fill:"填空"}[item.t];
+  const typeCls = {single:"main", multi:"multi", order:"order", fill:"fill"}[item.t];
+
+  let body = "";
+  if(item.t === "single" || item.t === "multi"){
+    body = `<div class="opts" id="opts">` + item.disp.map((o,idx)=>`
+      <button class="opt" data-opt="${idx}">
+        <span class="k">${String.fromCharCode(65+idx)}</span>
+        <span>${o.text}</span>
+      </button>`).join("") + `</div>`;
+  } else if(item.t === "order"){
+    body = `
+      <div class="seqbox" id="seqbox"><div class="ph">按顺序点击下面的步骤，填进这里</div></div>
+      <div class="opts" id="opts">` + item.disp.map((o,idx)=>`
+        <button class="opt" data-order="${idx}">
+          <span class="k">${String.fromCharCode(65+idx)}</span>
+          <span>${o.text}</span>
+        </button>`).join("") + `</div>`;
+  } else {
+    body = `<div class="fillwrap">
+      <input id="fillInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="输入命令或答案（不区分大小写）">
+      <div class="hintline" id="hintline"></div>
+      <button class="hintbtn" data-act="hint">需要提示？</button>
+    </div>`;
+  }
+
+  app.innerHTML = `
+    <div class="gamehead">
+      <button class="iconbtn" data-act="quit">←</button>
+      <div class="gtitle">
+        <b>${lv.name}</b>
+        <span>第 ${i+1} / ${qs.length} 题 · 正确 ${S.correct}</span>
+      </div>
+      <div class="combo ${combo>=2?"":"hide"}">连击 ×${combo}</div>
+    </div>
+    <div class="progress"><i style="width:${progress}%"></i></div>
+
+    <div class="qcard">
+      <div class="qtags">
+        <span class="qt ${typeCls}">${typeLabel}</span>
+        ${q.tag ? `<span class="qt">${q.tag}</span>` : ""}
+      </div>
+      ${item.s ? `<div class="scenario">${item.s}</div>` : ""}
+      <p class="qtext">${item.text}</p>
+      ${body}
+      <div id="fb"></div>
+    </div>
+
+    <div class="actionbar" id="bar">
+      <button class="btn primary" id="mainBtn" data-act="submit" disabled>提交答案</button>
+    </div>
+  `;
+
+  bindGameEvents();
+}
+
+function bindGameEvents(){
+  const item = S.qs[S.i];
+
+  if(item.t === "single"){
+    document.getElementById("opts").addEventListener("click", e=>{
+      const b = e.target.closest("[data-opt]");
+      if(!b || S.answered) return;
+      const idx = +b.dataset.opt;
+      S.sel = new Set([idx]);
+      document.querySelectorAll("#opts .opt").forEach((el,k)=>el.classList.toggle("sel", k===idx));
+      syncButton();
+    });
+  }
+
+  if(item.t === "multi"){
+    document.getElementById("opts").addEventListener("click", e=>{
+      const b = e.target.closest("[data-opt]");
+      if(!b || S.answered) return;
+      const idx = +b.dataset.opt;
+      if(S.sel.has(idx)) S.sel.delete(idx); else S.sel.add(idx);
+      document.querySelectorAll("#opts .opt").forEach((el,k)=>el.classList.toggle("sel", S.sel.has(k)));
+      syncButton();
+    });
+  }
+
+  if(item.t === "order"){
+    document.getElementById("opts").addEventListener("click", e=>{
+      const b = e.target.closest("[data-order]");
+      if(!b || S.answered) return;
+      const idx = +b.dataset.order;
+      const pos = S.seq.indexOf(idx);
+      if(pos >= 0) S.seq.splice(pos,1); else S.seq.push(idx);
+      paintSeq();
+      syncButton();
+    });
+  }
+
+  if(item.t === "fill"){
+    const inp = document.getElementById("fillInput");
+    inp.addEventListener("input", syncButton);
+    inp.addEventListener("keydown", e=>{
+      if(e.key === "Enter"){ e.preventDefault(); if(!document.getElementById("mainBtn").disabled) submit(); }
+    });
+    setTimeout(()=>inp.focus(), 120);
+  }
+
+  document.getElementById("mainBtn").addEventListener("click", ()=>{
+    if(S.answered) next(); else submit();
+  });
+}
+
+function paintSeq(){
+  const box = document.getElementById("seqbox");
+  if(!box) return;
+  const item = S.qs[S.i];
+  if(S.seq.length === 0){
+    box.innerHTML = `<div class="ph">按顺序点击下面的步骤，填进这里</div>`;
+  } else {
+    box.innerHTML = S.seq.map((idx,pos)=>{
+      const d = item.disp[idx];
+      return `<div class="seqitem"><span class="n">${pos+1}</span><span>${d.text}</span></div>`;
+    }).join("");
+  }
+  document.querySelectorAll("#opts .opt").forEach(el=>{
+    const idx = +el.dataset.order;
+    el.classList.toggle("picked", S.seq.includes(idx));
+  });
+}
+
+function syncButton(){
+  const item = S.qs[S.i];
+  const btn = document.getElementById("mainBtn");
+  if(!btn || S.answered) return;
+  let ok = false;
+  if(item.t === "single") ok = S.sel.size === 1;
+  else if(item.t === "multi") ok = S.sel.size >= 1;
+  else if(item.t === "order") ok = S.seq.length === item.disp.length;
+  else if(item.t === "fill"){
+    const v = (document.getElementById("fillInput")||{}).value || "";
+    ok = v.trim().length > 0;
+  }
+  btn.disabled = !ok;
+}
+
+function submit(){
+  const item = S.qs[S.i];
+  const q = item.q;
+  let ok = false;
+  let userLabel = "";
+
+  if(item.t === "single"){
+    const idx = [...S.sel][0];
+    ok = idx === item.correct;
+    markOptionsSingle(item, idx);
+  } else if(item.t === "multi"){
+    const arr = [...S.sel].sort((a,b)=>a-b);
+    ok = arr.length === item.correct.length && arr.every((v,k)=>v === item.correct[k]);
+    markOptionsMulti(item, arr);
+  } else if(item.t === "order"){
+    const origSeq = S.seq.map(i=>item.disp[i].orig);
+    ok = origSeq.every((v,k)=>v === k);
+    markOptionsOrder(item, origSeq);
+  } else if(item.t === "fill"){
+    const inp = document.getElementById("fillInput");
+    const val = inp ? inp.value : "";
+    ok = item.accept.some(a => norm(val) === a || (a.length>3 && norm(val).includes(a)));
+    inp.disabled = true;
+    inp.style.borderColor = ok ? "rgba(52,211,153,.6)" : "rgba(248,113,113,.6)";
+    userLabel = val;
+  }
+
+  S.answered = true;
+
+  if(ok){
+    S.correct++;
+    S.xp += 10 + Math.min(S.combo,5)*2;
+    S.combo++;
+    S.maxCombo = Math.max(S.maxCombo, S.combo);
+    lv_wrong_remove(q._id);
+  } else {
+    S.combo = 0;
+    addWrong(q._id);
+  }
+
+  S.results.push({item, ok});
+
+  const fb = document.getElementById("fb");
+  const correctText = correctAnswerText(item);
+  const comboNote = ok && S.combo >= 2 ? `<div style="margin-top:8px;font-size:12px;color:var(--am);font-family:var(--mono)">🔥 连击 ×${S.combo}</div>` : "";
+
+  fb.innerHTML = `
+    <div class="fb ${ok?"ok":"no"}">
+      <div class="fb-h">${ok ? "✓ 正确" : "✕ 答错了"}</div>
+      <div class="fb-b">
+        ${!ok ? `<div style="margin-bottom:8px"><b>正确答案：</b>${correctText}</div>` : ""}
+        ${!ok && userLabel ? `<div style="margin-bottom:8px;color:var(--dim)"><b>你的答案：</b>${esc(userLabel)}</div>` : ""}
+        ${q.e}
+      </div>
+      ${comboNote}
+    </div>`;
+
+  const btn = document.getElementById("mainBtn");
+  btn.textContent = (S.i === S.qs.length-1) ? "查看成绩 →" : "下一题 →";
+  btn.disabled = false;
+  btn.dataset.mode = "next";
+
+  const comboEl = document.querySelector(".combo");
+  if(comboEl){
+    comboEl.classList.toggle("hide", S.combo < 2);
+    comboEl.textContent = `连击 ×${S.combo}`;
+  }
+  document.querySelector(".progress i").style.width = ((S.i+1)/S.qs.length*100) + "%";
+
+  save();
+  setTimeout(()=>{
+    const bar = document.getElementById("bar");
+    if(bar) bar.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }, 60);
+}
+
+function lv_wrong_remove(id){
+  const k = state.wrong.indexOf(id);
+  if(k >= 0){ state.wrong.splice(k,1); return true; }
+  return false;
+}
+function addWrong(id){
+  if(!state.wrong.includes(id)) state.wrong.push(id);
+}
+
+function markOptionsSingle(item, chosen){
+  document.querySelectorAll("#opts .opt").forEach((el,k)=>{
+    el.classList.add("dim");
+    el.classList.remove("sel");
+    if(k === item.correct) el.classList.add("correct");
+    if(k === chosen && chosen !== item.correct) el.classList.add("wrong");
+  });
+}
+function markOptionsMulti(item, chosen){
+  const set = new Set(chosen), corr = new Set(item.correct);
+  document.querySelectorAll("#opts .opt").forEach((el,k)=>{
+    el.classList.add("dim");
+    el.classList.remove("sel");
+    if(corr.has(k)) el.classList.add("correct");
+    else if(set.has(k)) el.classList.add("wrong");
+  });
+}
+function markOptionsOrder(item, origSeq){
+  const wrongPos = new Set();
+  origSeq.forEach((v,k)=>{ if(v !== k) wrongPos.add(k); });
+  // 给排序结果区着色
+  const box = document.getElementById("seqbox");
+  if(box){
+    box.querySelectorAll(".seqitem").forEach((el,k)=>{
+      el.style.borderColor = wrongPos.has(k) ? "rgba(248,113,113,.5)" : "rgba(52,211,153,.5)";
+      el.style.background  = wrongPos.has(k) ? "rgba(248,113,113,.1)" : "rgba(52,211,153,.1)";
+    });
+  }
+  document.querySelectorAll("#opts .opt").forEach(el=>el.classList.add("dim"));
+}
+
+function correctAnswerText(item){
+  if(item.t === "single") return `<b>${esc(item.disp[item.correct].text)}</b>`;
+  if(item.t === "multi") return item.correct.map(i=>`<b>${esc(item.disp[i].text)}</b>`).join("；");
+  if(item.t === "order"){
+    return "<br>" + item.disp.slice().sort((a,b)=>a.orig-b.orig).map((o,i)=>`${i+1}. ${esc(o.text)}`).join("<br>");
+  }
+  return `<b>${esc(item.q.a[0])}</b>`;
+}
+
+function next(){
+  if(S.i < S.qs.length - 1){
+    S.i++;
+    S.answered = false;
+    S.sel = new Set();
+    S.seq = [];
+    renderGame();
+    window.scrollTo({top:0, behavior:"smooth"});
+  } else {
+    finishLevel();
+  }
+}
+
+/* =========================================================
+   结算
+   ========================================================= */
+function finishLevel(){
+  const {lv, correct, qs, xp, maxCombo} = S;
+  const total = qs.length;
+  const acc = Math.round(correct / total * 100);
+  const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
+
+  const st = state.levels[lv.id];
+  st.done = true;
+  st.best = Math.max(st.best, acc);
+  st.stars = Math.max(st.stars, stars);
+  st.bestXp = Math.max(st.bestXp, xp);
+
+  const newBadges = [];
+  const grant = id => {
+    if(!state.badges.includes(id)){
+      state.badges.push(id);
+      const b = BADGES.find(x=>x.id===id);
+      if(b) newBadges.push(b);
+    }
+  };
+  grant("first");
+  if(acc === 100) grant("perfect");
+  if(maxCombo >= 8) grant("combo");
+  const starBadge = {ad:"ad3", pki:"pki3", gpo:"gpo3", dfs:"dfs3", iis:"iis3"}[lv.id];
+  if(starBadge && stars === 3) grant(starBadge);
+  if(LEVELS.filter(l=>!l.boss).every(l=>state.levels[l.id].done)) grant("all");
+  if(lv.boss) grant("boss");
+
+  save();
+  renderResult({lv, acc, correct, total, stars, xp, maxCombo, newBadges});
+}
+
+function renderResult(r){
+  const {lv, acc, correct, total, stars, xp, maxCombo, newBadges} = r;
+  const wrongs = S.results.filter(x=>!x.ok);
+
+  const starHtml = [0,1,2].map(i=> i<stars ? "<i>★</i>" : "★").join("");
+  const title = acc >= 90 ? "通关！" : acc >= 70 ? "过关" : "勉强通过";
+  const sub = acc === 100 ? "完美，一题都没错。" : acc >= 90 ? "几乎无懈可击。" : acc >= 70 ? "基础还行，错题再刷一遍更稳。" : "错题较多，建议先看知识卡再重来。";
+
+  const wrongHtml = wrongs.length ? `
+    <div class="section-title" style="margin-top:22px">错题回顾 (${wrongs.length})</div>
+    <div class="reviewlist">
+      ${wrongs.map(w=>`
+        <div class="rv">
+          <div class="rq">${esc(w.item.text)}</div>
+          <div class="ra">正确答案：${correctAnswerPlain(w.item)}</div>
+          <div class="re">${w.item.e}</div>
+        </div>`).join("")}
+    </div>` : "";
+
+  const badgeHtml = newBadges.length ? `
+    <div style="margin-top:18px;padding:14px;border-radius:16px;border:1px solid rgba(251,191,36,.32);background:rgba(251,191,36,.08);text-align:left">
+      <div style="font-size:12px;letter-spacing:1.4px;color:var(--am);margin-bottom:9px">新徽章解锁</div>
+      <div class="badges">
+        ${newBadges.map(b=>`<div class="badge"><span class="bi">${b.icon}</span><div><div>${b.name}</div><small>${b.desc}</small></div></div>`).join("")}
+      </div>
+    </div>` : "";
+
+  app.innerHTML = `
+    <div class="result">
+      <div class="big">${title}</div>
+      <div class="sub">${lv.name} · ${sub}</div>
+      <div class="bigstars">${starHtml}</div>
+      <div class="statrow">
+        <div class="sbox"><b>${acc}%</b><span>正确率</span></div>
+        <div class="sbox"><b>${correct}/${total}</b><span>答对</span></div>
+        <div class="sbox"><b>×${maxCombo}</b><span>最高连击</span></div>
+      </div>
+      <div class="sbox" style="margin-bottom:4px"><b>+${xp} XP</b><span>本关获得</span></div>
+      ${badgeHtml}
+    </div>
+    ${wrongHtml}
+    <div class="actionbar">
+      <button class="btn ghost" data-act="home">返回地图</button>
+      <button class="btn primary grow2" data-act="retry" data-level="${lv.id}">再来一次</button>
+    </div>
+  `;
+}
+
+function correctAnswerPlain(item){
+  if(item.t === "single") return esc(item.disp[item.correct].text);
+  if(item.t === "multi") return item.correct.map(i=>esc(item.disp[i].text)).join("；");
+  if(item.t === "order") return item.disp.slice().sort((a,b)=>a.orig-b.orig).map((o,i)=>`${i+1}. ${esc(o.text)}`).join("  ");
+  return esc(item.q.a[0]);
+}
+
+/* =========================================================
+   错题本
+   ========================================================= */
+function renderReview(){
+  const items = state.wrong.map(id=>QMAP[id]).filter(Boolean);
+  app.innerHTML = `
+    <div class="gamehead">
+      <button class="iconbtn" data-act="home">←</button>
+      <div class="gtitle"><b>错题本</b><span>${items.length} 道待复习</span></div>
+    </div>
+    ${items.length ? `<div class="reviewlist">
+      ${items.map(it=>`
+        <div class="rv">
+          <div style="font-size:10.5px;letter-spacing:1px;color:var(--dim);font-family:var(--mono);margin-bottom:6px">${it.lv.name}</div>
+          <div class="rq">${esc(it.q.q)}</div>
+          <div class="ra">正确答案：${plainAnswer(it.q)}</div>
+          <div class="re">${it.q.e}</div>
+        </div>`).join("")}
+    </div>
+    <div class="actionbar">
+      <button class="btn ghost" data-act="clearwrong">清空错题本</button>
+    </div>` : `<div class="empty">还没有错题。<br>答错的题会自动出现在这里。</div>`}
+  `;
+}
+
+function plainAnswer(q){
+  if(q.t === "single") return esc(q.o[q.a]);
+  if(q.t === "multi") return q.a.map(i=>esc(q.o[i])).join("；");
+  if(q.t === "order") return q.o.map((t,i)=>`${i+1}. ${esc(t)}`).join("  ");
+  return esc(q.a[0]);
+}
+
+/* =========================================================
+   事件委托
+   ========================================================= */
+document.addEventListener("click", e=>{
+  const cheat = e.target.closest("[data-cheat]");
+  if(cheat){ e.stopPropagation(); renderCheat(cheat.dataset.cheat); return; }
+
+  const card = e.target.closest(".card[data-level]");
+  if(card) { startLevel(card.dataset.level); return; }
+
+  const actEl = e.target.closest("[data-act]");
+  if(!actEl) return;
+  const act = actEl.dataset.act;
+
+  if(act === "home"){ renderHome(); window.scrollTo({top:0}); }
+  else if(act === "review"){ renderReview(); window.scrollTo({top:0}); }
+  else if(act === "start"){ startLevel(actEl.dataset.level); }
+  else if(act === "retry"){ startLevel(actEl.dataset.level); }
+  else if(act === "quit"){
+    if(confirm("退出本关？本关进度不会保存。")){ renderHome(); window.scrollTo({top:0}); }
+  }
+  else if(act === "hint"){
+    const item = S.qs[S.i];
+    const q = item.q;
+    const hl = document.getElementById("hintline");
+    if(hl) hl.textContent = q.hint ? "提示：" + q.hint : "提示：" + q.a[0].length + " 个字符";
+    actEl.style.display = "none";
+  }
+  else if(act === "clearwrong"){
+    if(confirm("清空错题本？")){ state.wrong = []; save(); renderReview(); }
+  }
+  else if(act === "reset"){
+    if(confirm("重置全部进度？XP、徽章、错题都会清空，无法恢复。")){
+      state = blankState();
+      save();
+      renderHome();
+    }
+  }
+});
+
+/* 键盘快捷键（桌面端） */
+document.addEventListener("keydown", e=>{
+  if(!S || !document.getElementById("opts")) return;
+  const item = S.qs[S.i];
+  if(S.answered){
+    if(e.key === "Enter"){ e.preventDefault(); next(); }
+    return;
+  }
+  if(e.key === "Enter"){
+    const btn = document.getElementById("mainBtn");
+    if(btn && !btn.disabled){ e.preventDefault(); submit(); }
+    return;
+  }
+  const n = parseInt(e.key, 10);
+  if(!isNaN(n) && n >= 1 && n <= 9){
+    if(item.t === "single" || item.t === "multi"){
+      const el = document.querySelector(`#opts .opt[data-opt="${n-1}"]`);
+      if(el) el.click();
+    } else if(item.t === "order"){
+      const el = document.querySelector(`#opts .opt[data-order="${n-1}"]`);
+      if(el) el.click();
+    }
+  }
+});
+
+/* 深链接：index.html#ad / #pki / #gpo / #dfs / #iis / #boss / #review */
+function applyHash(){
+  const h = (location.hash || "").replace(/^#\/?/, "").trim();
+  if(!h) return false;
+  if(h === "review"){ renderReview(); return true; }
+  const lv = LEVELS.find(l=>l.id === h);
+  if(lv && startLevel(lv.id)) return true;
+  return false;
+}
+
+/* 启动 */
+if(!applyHash()) renderHome();
+</script>
+</body>
+</html>

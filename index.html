@@ -332,6 +332,19 @@ body::after{
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hidden{display:none!important}
+
+/* ---------- save modal ---------- */
+.modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,8,14,.76);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadein .2s both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal-card{width:100%;max-width:460px;max-height:86vh;overflow:auto;border:1px solid var(--line2);border-radius:20px;background:#0d1524;padding:18px;animation:rise .28s cubic-bezier(.2,.8,.2,1) both}
+.modal-card h3{margin:0 0 4px;font-size:15px}
+.modal-card p{margin:0 0 10px;font-size:12.5px;color:var(--dim);line-height:1.6}
+.modal-card .field{margin-bottom:16px}
+.modal-card textarea{width:100%;height:88px;font-family:var(--mono);font-size:11px;line-height:1.5;background:rgba(0,0,0,.36);color:#9fb0c8;border:1px solid var(--line);border-radius:12px;padding:10px;resize:none;outline:none;word-break:break-all}
+.modal-card input{width:100%;font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.36);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;margin-bottom:9px}
+.modal-card input:focus{border-color:rgba(34,211,238,.55)}
+.modal-note{font-size:11.5px;color:var(--dim);line-height:1.7;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
+.warnline{color:var(--am);font-size:11.5px;line-height:1.7;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -1045,10 +1058,65 @@ function load(){
   }catch(e){ return blankState(); }
 }
 
+let storageOK = true;
+try{ localStorage.setItem("__nq_probe","1"); localStorage.removeItem("__nq_probe"); }catch(e){ storageOK = false; }
+
 let state = load();
 
 function save(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* 存档码：base64(JSON)，跨设备/跨域搬迁进度 */
+function encodeSave(){
+  const l = {};
+  Object.keys(state.levels).forEach(k=>{
+    const v = state.levels[k];
+    l[k] = [v.stars, v.best, v.bestXp, v.done ? 1 : 0];
+  });
+  const payload = JSON.stringify({v:1, l, b:state.badges, w:state.wrong});
+  const bytes = new TextEncoder().encode(payload);
+  let bin = "";
+  bytes.forEach(b=>{ bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/=+$/,"");
+}
+
+function decodeSave(code){
+  try{
+    let s = String(code).trim().replace(/\s+/g,"");
+    s = s.replace(/-/g,"+").replace(/_/g,"/");
+    while(s.length % 4) s += "=";
+    const bin = atob(s);
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    const obj = JSON.parse(new TextDecoder().decode(bytes));
+    if(!obj || obj.v !== 1 || typeof obj.l !== "object") return null;
+    return obj;
+  }catch(e){ return null; }
+}
+
+function mergeSave(obj){
+  let touched = 0;
+  Object.keys(state.levels).forEach(id=>{
+    const inc = obj.l[id];
+    if(!Array.isArray(inc)) return;
+    const cur = state.levels[id];
+    const [stars, best, bestXp, done] = inc.map(n=>Number(n)||0);
+    const before = JSON.stringify(cur);
+    cur.stars = Math.max(cur.stars, Math.min(3, stars));
+    cur.best = Math.max(cur.best, Math.min(100, best));
+    cur.bestXp = Math.max(cur.bestXp, bestXp);
+    cur.done = cur.done || !!done;
+    if(JSON.stringify(cur) !== before) touched++;
+  });
+  (Array.isArray(obj.b) ? obj.b : []).forEach(id=>{
+    if(BADGES.some(b=>b.id===id) && !state.badges.includes(id)) state.badges.push(id);
+  });
+  (Array.isArray(obj.w) ? obj.w : []).forEach(id=>{
+    if(QMAP[id] && !state.wrong.includes(id)) state.wrong.push(id);
+  });
+  save();
+  return touched;
 }
 
 /* 给每道题生成稳定 id */
@@ -1170,7 +1238,9 @@ function renderHome(){
     </div>
 
     <div class="footer">
-      进度保存在本机浏览器 · 换设备不会同步<br>
+      ${storageOK ? "" : `<div class="warnline">当前浏览器禁止了本地存储，进度不会自动保存 —— 请用「存档码」手动备份。</div>`}
+      进度保存在本机浏览器 · 换设备或换链接不会自动同步<br>
+      <button class="linkbtn" data-act="savebox">📦 存档码</button> ·
       <button class="linkbtn" data-act="reset">重置全部进度</button>
     </div>
   `;
@@ -1640,6 +1710,71 @@ function plainAnswer(q){
 }
 
 /* =========================================================
+   存档码弹窗
+   ========================================================= */
+function openSaveModal(){
+  closeSaveModal();
+  const el = document.createElement("div");
+  el.className = "modal";
+  el.id = "saveModal";
+  el.innerHTML = `
+    <div class="modal-card">
+      <div class="field">
+        <h3>📦 我的存档码</h3>
+        <p>复制这段码，在另一台设备或另一个链接里粘贴导入，进度就能搬过去。</p>
+        <textarea id="saveCode" readonly>${encodeSave()}</textarea>
+      </div>
+      <button class="btn primary" data-act="copysave" style="width:100%;margin-bottom:20px">复制存档码</button>
+
+      <div class="field">
+        <h3>导入存档</h3>
+        <p>粘贴存档码后会与本机进度<b>合并</b>：只取更高的星级和分数，不会把已有进度冲掉。</p>
+        <input id="importCode" placeholder="粘贴存档码" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn" data-act="importsave" style="width:100%">导入并合并</button>
+      </div>
+
+      <div class="modal-note">
+        把存档码发给自己存进备忘录，就是一份备份。即使清了浏览器数据，也能靠它恢复。
+      </div>
+      <div class="actionbar" style="position:static;background:none;margin-top:14px;padding:0">
+        <button class="btn ghost" data-act="closesave">关闭</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener("click", e=>{ if(e.target === el) closeSaveModal(); });
+}
+
+function closeSaveModal(){
+  const el = document.getElementById("saveModal");
+  if(el) el.remove();
+}
+
+async function copyText(text){
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta = document.getElementById("saveCode");
+    if(!ta) return false;
+    ta.removeAttribute("readonly");
+    ta.select();
+    ta.setSelectionRange(0, 99999);
+    const ok = document.execCommand("copy");
+    ta.setAttribute("readonly","readonly");
+    return ok;
+  }catch(e){ return false; }
+}
+
+function importSaveCode(str){
+  const obj = decodeSave(str);
+  if(!obj) return -1;
+  return mergeSave(obj);
+}
+
+/* =========================================================
    事件委托
    ========================================================= */
 document.addEventListener("click", e=>{
@@ -1655,6 +1790,19 @@ document.addEventListener("click", e=>{
 
   if(act === "home"){ renderHome(); window.scrollTo({top:0}); }
   else if(act === "review"){ renderReview(); window.scrollTo({top:0}); }
+  else if(act === "savebox"){ openSaveModal(); }
+  else if(act === "closesave"){ closeSaveModal(); }
+  else if(act === "copysave"){
+    copyText(encodeSave()).then(ok => toast(ok ? "已复制，粘到另一台设备即可" : "复制失败，请长按手动选择"));
+  }
+  else if(act === "importsave"){
+    const inp = document.getElementById("importCode");
+    const n = importSaveCode(inp ? inp.value : "");
+    if(n < 0){ toast("存档码无效，检查是否复制完整"); return; }
+    closeSaveModal();
+    renderHome();
+    toast(n > 0 ? "已合并存档，进度已更新" : "已合并，没有更高的记录");
+  }
   else if(act === "start"){ startLevel(actEl.dataset.level); }
   else if(act === "retry"){ startLevel(actEl.dataset.level); }
   else if(act === "quit"){
@@ -1708,6 +1856,13 @@ document.addEventListener("keydown", e=>{
 function applyHash(){
   const h = (location.hash || "").replace(/^#\/?/, "").trim();
   if(!h) return false;
+  if(h.indexOf("save=") === 0){
+    const n = importSaveCode(h.slice(5));
+    if(n > 0) toast("已从链接导入存档");
+    try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+    renderHome();
+    return true;
+  }
   if(h === "review"){ renderReview(); return true; }
   const lv = LEVELS.find(l=>l.id === h);
   if(lv && startLevel(lv.id)) return true;
